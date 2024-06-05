@@ -1,0 +1,6 @@
+{
+  "env": {
+    "SERVER_PORT": 3000,
+    "MQTT_BROKER_URL": "mqtt://localhost:1883"
+  }
+}

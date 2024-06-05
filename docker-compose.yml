@@ -1,0 +1,46 @@
+services:
+  mosquitto:
+    image: eclipse-mosquitto:latest
+    container_name: mosquitto
+    restart: unless-stopped
+    ports:
+      - "1883:1883"
+      - "9001:9001"
+    volumes:
+      - ./mosquitto:/etc/mosquitto
+      - ./mosquitto/mosquitto.conf:/mosquitto/config/mosquitto.conf
+
+  couchdb:
+    image: couchdb:latest
+    ports:
+      - "5984:5984"
+    volumes:
+      - "./couchdb_data:/opt/couchdb/data"
+    environment:
+      - COUCHDB_USER=admin
+      - COUCHDB_PASSWORD=admin
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:5984/_up"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # backend:
+  #   build: ./backend
+  #   ports:
+  #     - "3000:3000"
+  #   depends_on:
+  #     couchdb:
+  #       condition: service_healthy
+  #   environment:
+  #     - COUCHDB_URL=http://admin:admin@couchdb:5984
+  #   command: sh -c "sleep 5 && node index.js"
+  #   volumes:
+  #     - ./backend:/usr/src/app # Mount the backend directory into the container, excluding node_modules
+
+  # frontend:
+  #   build: ./frontend
+  #   ports:
+  #     - "3001:3000"
+  #   depends_on:
+  #     - backend
